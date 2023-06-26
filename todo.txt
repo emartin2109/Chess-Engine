@@ -1,0 +1,25 @@
+    V1.0
+Rajouter les promotions à la liste de moves possibles
+Rajouter les rockes à la liste de moves possibles
+
+Optimiser comme un FDP
+
+Rajouter les valeurs et tt les stalemates possibles
+Rajouter une evaluation
+Rajouter la generation de moves et les demmandes à l'utilisateur
+
+
+    V1.1
+Degager les option deja considerer avec l'encodage de merde avec les XOR
+
+
+    V1.2
+Alpha Beta Prunning
+
+
+    V1.3
+Dictionnaire d'opening
+
+
+    V2.0
+Monte Carlo Tree Search
