@@ -5,21 +5,19 @@
 ## make file
 ##
 
-SRC	=	src/main.c	\
-		src/utils.c \
-        src/chess.c \
-        src/get_board.c \
-        src/printer.c	\
-		src/move.c	\
-		src/generate_moves.c	\
-		src/initialize.c
+SRC	=	src/main.c	                        \
+		src/utils.c                         \
+        src/main_loop/prepare_main_loop.c   \
+        src/board/create_board.c            \
+		src/display/draw_board.c 			\
+		src/display/input_handler.c
 
 
 OBJ	=	$(SRC:.c=.o)
 
-NAME	=	chess_bot
+NAME	=	ChessEngine
 
-CFLAGS += -g -W -Wall -Wextra -Wshadow -Wimplicit
+CFLAGS += -W -Wall -Wextra -Wshadow -Wimplicit -Werror -g
 
 CPPFLAGS += -I./include
 
@@ -27,7 +25,7 @@ all:	$(NAME)
 PHONY	+= all
 
 $(NAME):	$(OBJ)
-	gcc -o $(NAME) $(OBJ)
+	gcc -o $(NAME) $(OBJ) -lGL -lGLU -lglut -lSOIL
 
 clean:
 	rm -f $(OBJ)

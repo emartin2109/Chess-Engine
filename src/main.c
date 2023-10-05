@@ -1,15 +1,20 @@
 /*
 ** EPITECH PROJECT, 2023
-** chess bot number 2
+** stumper02
 ** File description:
 ** main
 */
 
-#include "chess.h"
+#include "main_loop.h"
+#include "global.h"
+#include "include.h"
+#include "utils.h"
+#include "define.h"
 
-global_board_info_t global_board_info;
+global_bitboards_t global_bitboards;
 
-int main(void)
+int main (int argc, char **argv)
 {
-    main_loop();
+    prepare_main_loop(argc, argv);
+    return 0;
 }

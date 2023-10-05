@@ -1,22 +1,56 @@
 /*
 ** EPITECH PROJECT, 2023
-** chess bot number 2
+** .type_repo
 ** File description:
 ** utils
 */
 
-#include "chess.h"
+#include "include.h"
+#include "global.h"
 
-char *get_input (void)
+long long unsigned int power (long long unsigned int number, long long unsigned int power)
 {
-    char *line = NULL;
-    size_t len = 0;
-    int read = 0;
-    read = getline(&line, &len, stdin);
-    if (read == -1) {
-        if (line != NULL)
-            free(line);
-        return NULL;
+    long long unsigned int result = 1;
+    for (long long unsigned int i = 0; i < power; i++)
+        result *= number;
+    return result;
+}
+
+void print_bitboard(long long unsigned int n)
+{
+    int i = 0;
+    long long unsigned int power_value = 63;
+    while (power_value < 64) {
+        if (n >= power(2, power_value)) {
+            n -= power(2, power_value);
+            printf("1");
+        } else {
+            printf("0");
+        }
+        if (++i == 8) {
+            printf("\n");
+            i = 0;
+        }
+        power_value--;
     }
-    return line;
+}
+
+void print_game()
+{
+    long long unsigned int n = global_bitboards.white_pieces;
+    int i = 0;
+    long long unsigned int power_value = 63;
+    while (power_value < 64) {
+        if (n >= power(2, power_value)) {
+            n -= power(2, power_value);
+            printf("1");
+        } else {
+            printf("0");
+        }
+        if (++i == 8) {
+            printf("\n");
+            i = 0;
+        }
+        power_value--;
+    }
 }

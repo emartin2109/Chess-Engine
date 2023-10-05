@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "chess.h": "c",
-        "generate_moves.C": "cpp",
-        "fcntl.h": "c"
-    }
-}
