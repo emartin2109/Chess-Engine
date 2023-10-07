@@ -2,6 +2,7 @@
 #include "define.h"
 #include "display.h"
 #include "global.h"
+#include "utils.h"
 
 // global variable needed for this shitty library
 GLuint pieceTextures[2][6];
@@ -67,6 +68,29 @@ void drawPiece(int pieceType, int isWhite, int x, int y) {
     glDisable(GL_TEXTURE_2D);
 }
 
+void drawCirclesOnSquares(long long unsigned int squares) {
+    glPointSize(5.0); // Set the size of the circles
+
+    glBegin(GL_POINTS);
+
+    for (int squareIndex = 0; squareIndex < 64; squareIndex++) {
+        if (squares & ((long long unsigned int)1 << squareIndex)) {
+            // Calculate the position of the square based on the squareIndex
+            int x = (7 - (squareIndex % 8)) * GRIDSIZE + GRIDSIZE / 2;
+            int y = ((squareIndex / 8)) * GRIDSIZE + GRIDSIZE / 2;
+
+            // Set the color of the circle (e.g., red)
+            glColor3f(1.0f, 0.0f, 0.0f);
+
+            // Draw the circle at the calculated position
+            glVertex2i(x, y);
+        }
+    }
+
+    glEnd();
+    glPointSize(1.0); // Reset the point size to default
+}
+
 void drawChessboard(void) 
 {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -105,11 +129,11 @@ void drawChessboard(void)
             case 5: piece = global_bitboards.pawn; break;
         }
 
-        piece = piece & global_bitboards.black_pieces;
+        piece = piece & global_bitboards.white_pieces;
         while (piece) {
             int square = __builtin_ffsll(piece) - 1;
-            int x = (square % 8) * GRIDSIZE;
-            int y = (7 - (square / 8)) * GRIDSIZE;
+            int x = (7 - (square % 8)) * GRIDSIZE;
+            int y = (square / 8) * GRIDSIZE;
             drawPiece(pieceType, 0, x, y); // 0 indicates white pieces
             piece &= ~(((long long unsigned int)1) << square);
         }
@@ -126,15 +150,17 @@ void drawChessboard(void)
             case 5: piece = global_bitboards.pawn; break;
         }
 
-        piece = piece & global_bitboards.white_pieces;
+        piece = piece & global_bitboards.black_pieces;
         while (piece) {
             int square = __builtin_ffsll(piece) - 1;
-            int x = (square % 8) * GRIDSIZE;
-            int y = (7 - (square / 8)) * GRIDSIZE;
+            int x = (7 - (square % 8)) * GRIDSIZE;
+            int y = (square / 8) * GRIDSIZE;
             drawPiece(pieceType, 1, x, y); // 1 indicates black pieces
             piece &= ~(((long long unsigned int)1) << square);
         }
     }
+
+    drawCirclesOnSquares(global_highlighted_squares);
 
     glFlush();
 }

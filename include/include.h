@@ -11,6 +11,7 @@
     // basic stuff
     #include <stdio.h>
     #include <stdbool.h>
+    #include <math.h>
 
     // display stuff
     #include <GL/glut.h>

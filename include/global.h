@@ -8,18 +8,15 @@
 #ifndef PUSHSWAP_H_
     #define PUSHSWAP_H_
 
-    typedef struct global_bitboards_s {
-        long long unsigned int black_pieces;
-        long long unsigned int white_pieces;
+    #include "include.h"
+    #include "struct.h"
 
-        long long unsigned int pawn;
-        long long unsigned int rook;
-        long long unsigned int knight;
-        long long unsigned int bishop;
-        long long unsigned int queen;
-        long long unsigned int king;
-    } global_bitboards_t;
 
-    extern global_bitboards_t global_bitboards;
+
+    extern bitboards_t global_bitboards;
+    extern fen_meta_data_t global_fen_meta_data;
+    extern flags_t global_flags;
+    extern precomputed_values_t precomputed_values;
+    extern long long int global_highlighted_squares;
 
 #endif /* !PUSHSWAP_H_ */

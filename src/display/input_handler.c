@@ -1,6 +1,7 @@
+#include "generate_moves.h"
 #include "include.h"
-#include "define.h"
 #include "display.h"
+#include "define.h"
 #include "global.h"
 #include "utils.h"
 #include "board.h"
@@ -19,22 +20,22 @@ char *load_fen_string()
     int square = 0;
     int emptyCount = 0;
     
-    for (int rank = 0; rank <= 7; rank++) {
-        for (int file = 0; file <= 7; file++) {
+    for (int rank = 7; rank >= 0; rank--) {
+        for (int file = 7; file >= 0; file--) {
             square = rank * 8 + file;
             
             char piece = ' ';
             int color = 0;
             
-            if (global_bitboards.black_pieces & power(2, square)) color += 6;
-            else if (global_bitboards.white_pieces & power(2, square)) color += 0;
+            if (global_bitboards.black_pieces & precomputed_values.power[square]) color += 0;
+            else if (global_bitboards.white_pieces & precomputed_values.power[square]) color += 6;
 
-            if (global_bitboards.pawn & power(2, square)) piece = *(pieceChars + 0 + color);
-            else if (global_bitboards.rook & power(2, square)) piece = *(pieceChars + 1 + color);
-            else if (global_bitboards.knight & power(2, square)) piece = *(pieceChars + 2 + color);
-            else if (global_bitboards.bishop & power(2, square)) piece = *(pieceChars + 3 + color);
-            else if (global_bitboards.queen & power(2, square)) piece = *(pieceChars + 4 + color);
-            else if (global_bitboards.king & power(2, square)) piece = *(pieceChars + 5 + color);
+            if (global_bitboards.pawn & precomputed_values.power[square]) piece = *(pieceChars + 0 + color);
+            else if (global_bitboards.rook & precomputed_values.power[square]) piece = *(pieceChars + 1 + color);
+            else if (global_bitboards.knight & precomputed_values.power[square]) piece = *(pieceChars + 2 + color);
+            else if (global_bitboards.bishop & precomputed_values.power[square]) piece = *(pieceChars + 3 + color);
+            else if (global_bitboards.queen & precomputed_values.power[square]) piece = *(pieceChars + 4 + color);
+            else if (global_bitboards.king & precomputed_values.power[square]) piece = *(pieceChars + 5 + color);
             
             if (piece == ' ') {
                 emptyCount++;
@@ -64,8 +65,6 @@ char *load_fen_string()
     // You can add castling rights, en passant square, halfmove clock, and fullmove number here
     
     *fen++ = '\0'; // Null-terminate the string
-
-    printf("%s\n", fen_temp);
     
     return fen_temp;
 }
@@ -126,24 +125,26 @@ long long unsigned int update_bitboard (long long unsigned int piece_bitboard, l
 // Mouse callback function to handle piece selection and movement
 void onMouseClick(int button, int state, int x, int y)
 {
+    if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
+        global_highlighted_squares = 0;
+        printf("cancelled, (%d, %d)\n", x, y);
+        selectedPiece = 0; // Cancel the selection
+        selectedSquare = 0;
+        display();
+    }
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
         // Calculate the square clicked
-        int squareX = x / GRIDSIZE;
-        int squareY = y / GRIDSIZE; // Flip the Y-coordinate
+        int squareX = (WINDOWWIDTH - x) / GRIDSIZE; // Flip the X-coordinate
+        int squareY = (WINDOWHEIGHT - y) / GRIDSIZE; // Flip the Y-coordinate
 
         // Calculate the index of the selected square
         int selectedSquareIndex = squareX + squareY * 8;
 
 
-        if (selectedPiece == 0) {
-            // If no piece is selected, check if there is a piece on the selected square
-            printf("seleted: %c%d\n", squareX + 'A', 8 - squareY);
-            if (((global_bitboards.white_pieces | global_bitboards.black_pieces) & power(2, selectedSquareIndex)) != 0) {
-                selectedPiece = power(2, selectedSquareIndex);
-            }
-        } else {
+        if (precomputed_values.power[selectedSquareIndex] & global_highlighted_squares) {
+            global_highlighted_squares = 0;
             // If a piece is already selected, set the destination square
-            selectedSquare = power(2, selectedSquareIndex);
+            selectedSquare = precomputed_values.power[selectedSquareIndex];
     
             global_bitboards.white_pieces = update_bitboard(global_bitboards.white_pieces, selectedPiece, selectedSquare);
             global_bitboards.black_pieces = update_bitboard(global_bitboards.black_pieces, selectedPiece, selectedSquare);
@@ -154,12 +155,21 @@ void onMouseClick(int button, int state, int x, int y)
             global_bitboards.king = update_bitboard(global_bitboards.king, selectedPiece, selectedSquare);
             global_bitboards.pawn = update_bitboard(global_bitboards.pawn, selectedPiece, selectedSquare);
 
-            printf("moved: %c%d\n", squareX + 'A', 8 - squareY);
+            printf("moved: %c%d\n", squareX + 'A', squareY + 1);
             rewind_chess_board(true, true);
             selectedSquare = 0;
             selectedPiece = 0;
+            if (global_fen_meta_data.white_turn) global_fen_meta_data.white_turn = false;
+            else global_fen_meta_data.white_turn = true;
             display();
         }
+        else if (((global_bitboards.white_pieces & precomputed_values.power[selectedSquareIndex]) && global_fen_meta_data.white_turn) || (global_bitboards.black_pieces & precomputed_values.power[selectedSquareIndex] && !global_fen_meta_data.white_turn)) {
+            // If no piece is selected, check if there is a piece on the selected square
+            printf("seleted: %c%d\n", squareX + 'A', squareY + 1);
+            global_highlighted_squares = get_action_from_bitboard(precomputed_values.power[selectedSquareIndex]);
+            selectedPiece = precomputed_values.power[selectedSquareIndex];
+            display();
+        } 
     }
 }
 
@@ -167,9 +177,11 @@ void onMouseClick(int button, int state, int x, int y)
 void onKeyPress(unsigned char key, int x, int y)
 {
     if (key == 'c') { // 27 is the ASCII code for the Escape key
+        global_highlighted_squares = 0;
         printf("cancelled, (%d, %d)\n", x, y);
         selectedPiece = 0; // Cancel the selection
         selectedSquare = 0;
+        display();
     }
     if (key == 'd') {
         rewind_chess_board(false, true);

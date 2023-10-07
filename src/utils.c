@@ -35,22 +35,3 @@ void print_bitboard(long long unsigned int n)
     }
 }
 
-void print_game()
-{
-    long long unsigned int n = global_bitboards.white_pieces;
-    int i = 0;
-    long long unsigned int power_value = 63;
-    while (power_value < 64) {
-        if (n >= power(2, power_value)) {
-            n -= power(2, power_value);
-            printf("1");
-        } else {
-            printf("0");
-        }
-        if (++i == 8) {
-            printf("\n");
-            i = 0;
-        }
-        power_value--;
-    }
-}

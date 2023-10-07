@@ -10,8 +10,13 @@
 #include "include.h"
 #include "utils.h"
 #include "define.h"
+#include "struct.h"
 
-global_bitboards_t global_bitboards;
+bitboards_t global_bitboards;
+fen_meta_data_t global_fen_meta_data;
+flags_t global_flags;
+precomputed_values_t precomputed_values;
+long long int global_highlighted_squares;
 
 int main (int argc, char **argv)
 {
