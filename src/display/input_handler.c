@@ -9,6 +9,7 @@
 // shitty opengl global variable
 long long unsigned int selectedPiece = 0; // Currently selected piece (initially none)
 long long unsigned int selectedSquare = 0; // Square where the piece will be moved
+moves_t current_moves = {0, 0, 0};
 
 const char pieceChars[] = "prnbqkPRNBQK";
 
@@ -112,14 +113,30 @@ void rewind_chess_board(bool is_add, bool is_forward)
 
 long long unsigned int update_bitboard (long long unsigned int piece_bitboard, long long unsigned int Piece, long long unsigned int Square)
 {
-    if (piece_bitboard & Square) {
-        piece_bitboard = piece_bitboard ^ Square;
-    }
+    if (piece_bitboard & Square) piece_bitboard = piece_bitboard ^ Square;
     if ((piece_bitboard ^ Piece) < piece_bitboard) {
         piece_bitboard = piece_bitboard ^ Piece;
         piece_bitboard = piece_bitboard | Square;
     }
     return piece_bitboard;
+}
+
+long long unsigned int update_bitboard_pawn (long long unsigned int Square, long long unsigned int Piece)
+{
+    if (global_bitboards.pawn & Square) global_bitboards.pawn ^= Square;
+    if ((global_bitboards.pawn ^ Piece) < global_bitboards.pawn) {
+        if (global_fen_meta_data.white_turn == true && (current_moves.en_passant & ((global_bitboards.pawn >> 32) & precomputed_values.filter_everything_exept_lowest_rank))) {
+            printf("shitty french move\n");
+            global_bitboards.pawn ^= Square >> 8;
+        }
+        if (global_fen_meta_data.white_turn == false && (current_moves.en_passant & ((global_bitboards.pawn >> 24) & precomputed_values.filter_everything_exept_lowest_rank))) {
+            printf("shitty french move\n");
+            global_bitboards.pawn ^= Square << 8;
+        }
+        global_bitboards.pawn = global_bitboards.pawn ^ Piece;
+        global_bitboards.pawn = global_bitboards.pawn | Square;
+    }
+    return global_bitboards.pawn;
 }
 
 // Mouse callback function to handle piece selection and movement
@@ -153,20 +170,28 @@ void onMouseClick(int button, int state, int x, int y)
             global_bitboards.bishop = update_bitboard(global_bitboards.bishop, selectedPiece, selectedSquare);
             global_bitboards.queen = update_bitboard(global_bitboards.queen, selectedPiece, selectedSquare);
             global_bitboards.king = update_bitboard(global_bitboards.king, selectedPiece, selectedSquare);
-            global_bitboards.pawn = update_bitboard(global_bitboards.pawn, selectedPiece, selectedSquare);
+            global_bitboards.pawn = update_bitboard_pawn(selectedSquare, selectedPiece);
 
-            printf("moved: %c%d\n", squareX + 'A', squareY + 1);
+            printf("moved: %c%d\n\n", squareX + 'A', squareY + 1);
             rewind_chess_board(true, true);
             selectedSquare = 0;
             selectedPiece = 0;
-            if (global_fen_meta_data.white_turn) global_fen_meta_data.white_turn = false;
-            else global_fen_meta_data.white_turn = true;
+            if (global_fen_meta_data.white_turn) {
+                global_fen_meta_data.en_passant = global_fen_meta_data.en_passant & precomputed_values.filter_upper_piecies;
+                global_fen_meta_data.white_turn = false;
+            }
+            else {
+                global_fen_meta_data.en_passant = global_fen_meta_data.en_passant & precomputed_values.filter_lower_piecies;
+                global_fen_meta_data.white_turn = true;
+            }
+            printf("\n");
             display();
         }
         else if (((global_bitboards.white_pieces & precomputed_values.power[selectedSquareIndex]) && global_fen_meta_data.white_turn) || (global_bitboards.black_pieces & precomputed_values.power[selectedSquareIndex] && !global_fen_meta_data.white_turn)) {
             // If no piece is selected, check if there is a piece on the selected square
             printf("seleted: %c%d\n", squareX + 'A', squareY + 1);
-            global_highlighted_squares = get_action_from_bitboard(precomputed_values.power[selectedSquareIndex]);
+            current_moves = get_action_from_bitboard(precomputed_values.power[selectedSquareIndex]);
+            global_highlighted_squares = current_moves.captures | current_moves.moves;
             selectedPiece = precomputed_values.power[selectedSquareIndex];
             display();
         } 

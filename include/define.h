@@ -19,5 +19,14 @@
     // Quality of life stuff
     #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
+    // flags for special moves
+    #define NO_FLAG 0b0000
+    #define EN_PASSANT_FLAG 0b0001
+    #define CASTLE_FLAG 0b0010
+    #define PROMOTE_QUEEN_FLAG 0b0011
+    #define PROMOTE_NIGHT_FLAG 0b0100
+    #define PROMOTE_ROOK_FLAG 0b0101
+    #define PROMOTE_BISHOP_FLAG 0b0110
+
 
 #endif /* !DEFINE_H_ */

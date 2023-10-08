@@ -13,6 +13,7 @@
     typedef struct moves_s {
         long long unsigned int moves;
         long long unsigned int captures;
+        unsigned char en_passant;
     } moves_t;
 
     typedef struct bitboards_s {
@@ -39,19 +40,23 @@
     } flags_t;
 
     typedef struct distance_to_edge_s {
-        int north;
-        int south;
-        int east;
-        int west;
-        int north_east;
-        int north_west;
-        int south_east;
-        int south_west;
+        unsigned char north;
+        unsigned char south;
+        unsigned char east;
+        unsigned char west;
+        unsigned char north_east;
+        unsigned char north_west;
+        unsigned char south_east;
+        unsigned char south_west;
     } distance_to_edge_t;
 
     typedef struct precomputed_values_s {
         distance_to_edge_t distances[64];
         long long unsigned int power[64];
+        long long unsigned int filter_upper_piecies;
+        long long unsigned int filter_lower_piecies;
+        unsigned char filter_everything_exept_lowest_rank;
+
     } precomputed_values_t;
 
 

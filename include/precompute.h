@@ -10,6 +10,7 @@
 
     void precompute_distance_to_edge();
     void precompute_power();
+    void precompute_filter();
 
 
 #endif /* !PRECOMPUTE_H_ */

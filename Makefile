@@ -12,6 +12,7 @@ SRC	=	src/main.c	                        			\
 		src/display/draw_board.c 						\
 		src/display/input_handler.c						\
 		src/generate_moves/generate_basic_moves.c		\
+		src/generate_moves/generate_special_moves.c		\
 		src/precompute/precompute_move_generation.c		\
 		src/precompute/precompute_utility_values.c	\
 

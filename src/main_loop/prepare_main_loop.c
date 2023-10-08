@@ -7,7 +7,9 @@
 void prepare_main_loop(int ac, char **av)
 {
     global_fen_meta_data.white_turn = 1;
+    global_fen_meta_data.en_passant = 0;
 
+    precompute_filter();
     precompute_distance_to_edge();
     precompute_power();
     create_board(START_POS);
