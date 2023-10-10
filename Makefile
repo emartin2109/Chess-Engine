@@ -14,7 +14,10 @@ SRC	=	src/main.c	                        			\
 		src/generate_moves/generate_basic_moves.c		\
 		src/generate_moves/generate_special_moves.c		\
 		src/precompute/precompute_move_generation.c		\
-		src/precompute/precompute_utility_values.c	\
+		src/precompute/precompute_utility_values.c		\
+		src/test/count_moves.c							\
+		src/move/make_a_move.c							\
+		src/move/update_bitboards.c					\
 
 
 OBJ	=	$(SRC:.c=.o)

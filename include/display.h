@@ -15,7 +15,6 @@
     void drawChessboard(void);
     void onMouseClick(int button, int state, int x, int y);
     void onKeyPress(unsigned char key, int x, int y);
-    void rewind_chess_board (bool is_add, bool is_forward);
 
 
 #endif /* !DISPLAY_H_ */

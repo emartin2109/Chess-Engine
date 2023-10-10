@@ -18,5 +18,6 @@
     extern flags_t global_flags;
     extern precomputed_values_t precomputed_values;
     extern long long int global_highlighted_squares;
+    extern moves_t current_moves;
 
 #endif /* !PUSHSWAP_H_ */

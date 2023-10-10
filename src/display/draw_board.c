@@ -3,6 +3,7 @@
 #include "display.h"
 #include "global.h"
 #include "utils.h"
+#include "board.h"
 
 // global variable needed for this shitty library
 GLuint pieceTextures[2][6];

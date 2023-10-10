@@ -40,11 +40,12 @@ int count_moves(long long unsigned int moves)
     int i = 63;
     int number_of_moves = 0;
     while (moves) {
-        if (i >= precomputed_values.power[i]) {
-            i -= precomputed_values.power[i];
+        if (moves >= precomputed_values.power[i]) {
+            moves -= precomputed_values.power[i];
             number_of_moves++;
         }
         i--;
     }
+    return number_of_moves;
 }
 
