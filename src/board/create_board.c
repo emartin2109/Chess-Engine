@@ -26,7 +26,7 @@ void create_board (char *fen)
     global_bitboards.bishop = 0;
     global_bitboards.queen = 0;
     global_bitboards.king = 0;
-    global_fen_meta_data.castle_right = 0;
+    // global_fen_meta_data.castle_right = 0;
     // global_fen_meta_data.en_passant = 0;
     // global_fen_meta_data.white_turn = true;
     global_highlighted_squares = 0;
@@ -62,6 +62,7 @@ void create_board (char *fen)
             y--;
         }
     }
+    /*
     if (fen[i] != '\0' && fen[++i] == 'b') global_fen_meta_data.white_turn = false;
     while (fen[++i] != '\0' && fen[i] != ' ') {
         if (fen[i] == 'Q') global_fen_meta_data.castle_right += precomputed_values.power[0];
@@ -69,6 +70,7 @@ void create_board (char *fen)
         if (fen[i] == 'q') global_fen_meta_data.castle_right += precomputed_values.power[2];
         if (fen[i] == 'k') global_fen_meta_data.castle_right += precomputed_values.power[3];
     }
+    */
     /*
     while (fen[++i] != '\0' && fen[i] != ' ') {
         global_fen_meta_data.en_passant += precomputed_values.power[convert_coord_to_number(fen + i)];

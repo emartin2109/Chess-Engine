@@ -22,6 +22,7 @@
     void genearte_pawn_double_moves (long long unsigned int move, long long unsigned int allies, long long unsigned int enemies ,moves_t *already_generated_moves);
     void generate_en_passant_moves_white (long long unsigned int pawn, int piece_nbr, moves_t *already_generated_moves);
     void generate_en_passant_moves_black (long long unsigned int pawn, int piece_nbr, moves_t *already_generated_moves);
+    void generate_castle (int piece_nbr, moves_t *already_generated_moves);
 
 
 #endif /* !GENERATE_MOVES_H_ */

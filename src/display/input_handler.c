@@ -111,32 +111,75 @@ void rewind_chess_board(bool is_add, bool is_forward)
 }
 
 
-long long unsigned int update_bitboard (long long unsigned int piece_bitboard, long long unsigned int Piece, long long unsigned int Square)
+long long unsigned int update_bitboard (long long unsigned int piece_bitboard, long long unsigned int Piece, long long unsigned int Square, long long unsigned int *allies, long long unsigned int *enemies)
 {
-    if (piece_bitboard & Square) piece_bitboard = piece_bitboard ^ Square;
+    if (piece_bitboard & Square) {
+        piece_bitboard ^= Square;
+        *enemies ^= Square;
+    }
     if ((piece_bitboard ^ Piece) < piece_bitboard) {
         piece_bitboard = piece_bitboard ^ Piece;
         piece_bitboard = piece_bitboard | Square;
+        *allies ^= Piece;
+        *allies |= Square;
     }
     return piece_bitboard;
 }
 
-long long unsigned int update_bitboard_pawn (long long unsigned int Square, long long unsigned int Piece)
+long long unsigned int update_bitboard_pawn (long long unsigned int Square, long long unsigned int Piece, long long unsigned int *allies, long long unsigned int *enemies)
 {
-    if (global_bitboards.pawn & Square) global_bitboards.pawn ^= Square;
+    if (global_bitboards.pawn & Square) {
+        global_bitboards.pawn ^= Square;
+        *enemies ^= Square;
+    }
     if ((global_bitboards.pawn ^ Piece) < global_bitboards.pawn) {
         if (global_fen_meta_data.white_turn == true && (current_moves.en_passant & ((global_bitboards.pawn >> 32) & precomputed_values.filter_everything_exept_lowest_rank))) {
-            printf("shitty french move\n");
             global_bitboards.pawn ^= Square >> 8;
+            *enemies ^= Square >> 8;
         }
         if (global_fen_meta_data.white_turn == false && (current_moves.en_passant & ((global_bitboards.pawn >> 24) & precomputed_values.filter_everything_exept_lowest_rank))) {
-            printf("shitty french move\n");
-            global_bitboards.pawn ^= Square << 8;
+            global_bitboards.pawn  ^= Square << 8;
+            *enemies ^= Square << 8;
         }
         global_bitboards.pawn = global_bitboards.pawn ^ Piece;
         global_bitboards.pawn = global_bitboards.pawn | Square;
+        *allies ^= Piece;
+        *allies |= Square;
     }
     return global_bitboards.pawn;
+}
+
+long long unsigned int update_bitboard_king (long long unsigned int Square, long long unsigned int Piece, long long unsigned int *allies, long long unsigned int *enemies)
+{
+    if (global_bitboards.king & Square) {
+        global_bitboards.king ^= Square;
+        *enemies ^= Square;
+    }
+    if ((global_bitboards.king ^ Piece) < global_bitboards.king) {
+        if (Square & global_bitboards.rook & precomputed_values.right_corners) {
+            global_bitboards.king += Square << 1;
+            global_bitboards.rook += Square << 2;
+            global_bitboards.rook -= Square;
+            *allies += Square << 1;
+            *allies += Square << 2;
+            *allies -= Square;
+        } else if (Square & global_bitboards.rook & precomputed_values.left_corners) {
+            global_bitboards.king += Square >> 1;
+            global_bitboards.rook += Square >> 2;
+            global_bitboards.rook -= Square;
+            *allies += Square >> 1;
+            *allies += Square >> 2;
+            *allies -= Square;
+        } else {
+            global_bitboards.king = global_bitboards.king | Square;
+            *allies |= Square;
+        }
+        global_bitboards.king = global_bitboards.king ^ Piece;
+        *allies ^= Piece;
+        if (Piece & global_bitboards.white_pieces) global_fen_meta_data.castle_right &= 0b1100;
+        if (Piece & global_bitboards.black_pieces) global_fen_meta_data.castle_right &= 0b0011;
+    }
+    return global_bitboards.king;
 }
 
 // Mouse callback function to handle piece selection and movement
@@ -162,15 +205,27 @@ void onMouseClick(int button, int state, int x, int y)
             global_highlighted_squares = 0;
             // If a piece is already selected, set the destination square
             selectedSquare = precomputed_values.power[selectedSquareIndex];
-    
-            global_bitboards.white_pieces = update_bitboard(global_bitboards.white_pieces, selectedPiece, selectedSquare);
-            global_bitboards.black_pieces = update_bitboard(global_bitboards.black_pieces, selectedPiece, selectedSquare);
-            global_bitboards.rook = update_bitboard(global_bitboards.rook, selectedPiece, selectedSquare);
-            global_bitboards.knight = update_bitboard(global_bitboards.knight, selectedPiece, selectedSquare);
-            global_bitboards.bishop = update_bitboard(global_bitboards.bishop, selectedPiece, selectedSquare);
-            global_bitboards.queen = update_bitboard(global_bitboards.queen, selectedPiece, selectedSquare);
-            global_bitboards.king = update_bitboard(global_bitboards.king, selectedPiece, selectedSquare);
-            global_bitboards.pawn = update_bitboard_pawn(selectedSquare, selectedPiece);
+
+            long long unsigned int *allies = NULL;
+            long long unsigned int *enemies = NULL;
+
+            if (global_fen_meta_data.white_turn) {
+                allies = &global_bitboards.white_pieces;
+                enemies = &global_bitboards.black_pieces;
+            } else {
+                allies = &global_bitboards.black_pieces;
+                enemies = &global_bitboards.white_pieces;
+            }
+            if (selectedSquare == precomputed_values.power[0]) global_fen_meta_data.castle_right &= 0b1101;
+            if (selectedSquare == precomputed_values.power[7]) global_fen_meta_data.castle_right &= 0b1110;
+            if (selectedSquare == precomputed_values.power[56]) global_fen_meta_data.castle_right &= 0b0111;
+            if (selectedSquare == precomputed_values.power[63]) global_fen_meta_data.castle_right &= 0b1011;
+            global_bitboards.king = update_bitboard_king(selectedSquare, selectedPiece, allies, enemies);
+            global_bitboards.pawn = update_bitboard_pawn(selectedSquare, selectedPiece, allies, enemies);
+            global_bitboards.rook = update_bitboard(global_bitboards.rook, selectedPiece, selectedSquare, allies, enemies);
+            global_bitboards.knight = update_bitboard(global_bitboards.knight, selectedPiece, selectedSquare, allies, enemies);
+            global_bitboards.bishop = update_bitboard(global_bitboards.bishop, selectedPiece, selectedSquare, allies, enemies);
+            global_bitboards.queen = update_bitboard(global_bitboards.queen, selectedPiece, selectedSquare, allies, enemies);
 
             printf("moved: %c%d\n\n", squareX + 'A', squareY + 1);
             rewind_chess_board(true, true);

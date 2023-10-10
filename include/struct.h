@@ -30,7 +30,7 @@
 
     typedef struct fen_meta_data_s {
         bool white_turn;
-        int castle_right;
+        unsigned char castle_right;
         long long unsigned int en_passant;
     } fen_meta_data_t;
 
@@ -55,6 +55,8 @@
         long long unsigned int power[64];
         long long unsigned int filter_upper_piecies;
         long long unsigned int filter_lower_piecies;
+        long long unsigned int right_corners;
+        long long unsigned int left_corners;
         unsigned char filter_everything_exept_lowest_rank;
 
     } precomputed_values_t;

@@ -145,6 +145,8 @@ moves_t generate_king_moves (long long unsigned int piece, long long unsigned in
     if (precomputed_values.distances[piece_nbr].south) generate_moves_and_captures_by_bitboard(precomputed_values.power[piece_nbr - 8], allies, enemies, &result);
     if (precomputed_values.distances[piece_nbr].south && precomputed_values.distances[piece_nbr].west) generate_moves_and_captures_by_bitboard(precomputed_values.power[piece_nbr - 9], allies, enemies, &result);
 
+    generate_castle(piece_nbr, &result);
+
     return result;
 }
 
