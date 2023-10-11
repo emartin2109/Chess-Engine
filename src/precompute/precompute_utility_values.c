@@ -19,4 +19,6 @@ void precompute_filter()
         if (i == 0 || i == 56) precomputed_values.right_corners += power(2, i);
         if (i == 7 || i == 63) precomputed_values.left_corners += power(2, i);
     }
+    precomputed_values.filter_pawn_double_squares =     0b0000000000000000000000001111111111111111000000000000000000000000;
+    precomputed_values.filter_pawns_strating_squares =  0b0000000011111111000000000000000000000000000000001111111100000000;
 }

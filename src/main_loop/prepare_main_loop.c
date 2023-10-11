@@ -3,6 +3,7 @@
 #include "define.h"
 #include "precompute.h"
 #include "global.h"
+#include "test.h"
 
 void prepare_main_loop(int ac, char **av)
 {
@@ -14,5 +15,10 @@ void prepare_main_loop(int ac, char **av)
     precompute_distance_to_edge();
     precompute_power();
     create_board(START_POS);
-    init_display(ac, av);
+
+    recursive_params_glo = get_recursive_params_glo();
+    // init_display(ac, av);
+    printf("%llu\n", count_moves_at_depth(0, get_recursive_params()));
+    ac = ac;
+    av = av;
 }

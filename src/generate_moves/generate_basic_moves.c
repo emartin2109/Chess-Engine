@@ -66,7 +66,7 @@ moves_t generate_sliding_moves(long long unsigned int piece, bool diagonal, bool
     return result;
 }
 
-moves_t generate_pawn_moves (long long unsigned int piece)
+moves_t generate_pawn_moves (long long unsigned int piece, recursive_params_t *recursive_params)
 {
     moves_t result;
     int piece_nbr = __builtin_ctzll(piece);
@@ -75,27 +75,27 @@ moves_t generate_pawn_moves (long long unsigned int piece)
     result.captures = 0;
     result.en_passant = 0;
 
-    if (global_fen_meta_data.white_turn) {
+    if (recursive_params->actual_white_turn) {
         // double moves
-        if (piece_nbr < 17) genearte_pawn_double_moves(precomputed_values.power[piece_nbr + 16], global_bitboards.white_pieces, global_bitboards.black_pieces, &result);
+        if (piece_nbr < 16) genearte_pawn_double_moves(precomputed_values.power[piece_nbr + 16], precomputed_values.power[piece_nbr + 8], recursive_params, &result);
 
         // en passant
-        generate_en_passant_moves_white(piece, piece_nbr, &result);
+        generate_en_passant_moves_white(piece, piece_nbr, &result, recursive_params);
 
         // basic moves
-        if (precomputed_values.distances[piece_nbr].north && precomputed_values.distances[piece_nbr].west) generate_captures_by_bitboard(precomputed_values.power[piece_nbr + 7], global_bitboards.black_pieces, &result);
-        if (precomputed_values.distances[piece_nbr].north) generate_moves_by_bitboard(precomputed_values.power[piece_nbr + 8], global_bitboards.white_pieces, global_bitboards.black_pieces, &result);
-        if (precomputed_values.distances[piece_nbr].north && precomputed_values.distances[piece_nbr].east) generate_captures_by_bitboard(precomputed_values.power[piece_nbr + 9], global_bitboards.black_pieces, &result);
+        if (precomputed_values.distances[piece_nbr].north && precomputed_values.distances[piece_nbr].west) generate_captures_by_bitboard(precomputed_values.power[piece_nbr + 7], recursive_params->local_bitboard_black, &result);
+        if (precomputed_values.distances[piece_nbr].north) generate_moves_by_bitboard(precomputed_values.power[piece_nbr + 8], recursive_params->local_bitboard_white, recursive_params->local_bitboard_black, &result);
+        if (precomputed_values.distances[piece_nbr].north && precomputed_values.distances[piece_nbr].east) generate_captures_by_bitboard(precomputed_values.power[piece_nbr + 9], recursive_params->local_bitboard_black, &result);
     }
     
     else {
-        if (piece_nbr > 47) genearte_pawn_double_moves(precomputed_values.power[piece_nbr - 16], global_bitboards.black_pieces, global_bitboards.white_pieces, &result);
+        if (piece_nbr > 47) genearte_pawn_double_moves(precomputed_values.power[piece_nbr - 16], precomputed_values.power[piece_nbr - 8], recursive_params, &result);
 
-        generate_en_passant_moves_black(piece, piece_nbr, &result);
+        generate_en_passant_moves_black(piece, piece_nbr, &result, recursive_params);
 
-        if (precomputed_values.distances[piece_nbr].south && precomputed_values.distances[piece_nbr].east) generate_captures_by_bitboard(precomputed_values.power[piece_nbr - 7], global_bitboards.white_pieces, &result);
-        if (precomputed_values.distances[piece_nbr].south) generate_moves_by_bitboard(precomputed_values.power[piece_nbr - 8], global_bitboards.black_pieces, global_bitboards.white_pieces, &result);
-        if (precomputed_values.distances[piece_nbr].south && precomputed_values.distances[piece_nbr].west) generate_captures_by_bitboard(precomputed_values.power[piece_nbr - 9], global_bitboards.white_pieces, &result);
+        if (precomputed_values.distances[piece_nbr].south && precomputed_values.distances[piece_nbr].east) generate_captures_by_bitboard(precomputed_values.power[piece_nbr - 7], recursive_params->local_bitboard_white, &result);
+        if (precomputed_values.distances[piece_nbr].south) generate_moves_by_bitboard(precomputed_values.power[piece_nbr - 8], recursive_params->local_bitboard_black, recursive_params->local_bitboard_white, &result);
+        if (precomputed_values.distances[piece_nbr].south && precomputed_values.distances[piece_nbr].west) generate_captures_by_bitboard(precomputed_values.power[piece_nbr - 9], recursive_params->local_bitboard_white, &result);
     }
 
     return result;
@@ -125,10 +125,12 @@ moves_t generate_knight_moves (long long unsigned int piece, long long unsigned 
     return result;
 }
 
-moves_t generate_king_moves (long long unsigned int piece, long long unsigned int allies, long long unsigned int enemies)
+moves_t generate_king_moves (long long unsigned int piece, recursive_params_t *recursive_params)
 {
     moves_t result;
     int piece_nbr = __builtin_ctzll(piece);
+    long long unsigned int allies = recursive_params->allies;
+    long long unsigned int enemies = recursive_params->enemies;
 
     result.moves = 0;
     result.captures = 0;
@@ -145,38 +147,26 @@ moves_t generate_king_moves (long long unsigned int piece, long long unsigned in
     if (precomputed_values.distances[piece_nbr].south) generate_moves_and_captures_by_bitboard(precomputed_values.power[piece_nbr - 8], allies, enemies, &result);
     if (precomputed_values.distances[piece_nbr].south && precomputed_values.distances[piece_nbr].west) generate_moves_and_captures_by_bitboard(precomputed_values.power[piece_nbr - 9], allies, enemies, &result);
 
-    generate_castle(piece_nbr, &result);
+    generate_castle(piece_nbr, &result, recursive_params);
 
     return result;
 }
 
-moves_t get_action_from_bitboard (long long unsigned int piece)
+moves_t get_action_from_bitboard (long long unsigned int piece, recursive_params_t *recursive_params)
 {
     moves_t moves;
-    long long unsigned int allies;
-    long long unsigned int enemies;
 
-    if (global_fen_meta_data.white_turn) {
-        printf("withe turn !\n");
-        allies = global_bitboards.white_pieces;
-        enemies = global_bitboards.black_pieces;
-    } else {
-        printf("black turn !\n");
-        allies = global_bitboards.black_pieces;
-        enemies = global_bitboards.white_pieces;
-    }
+    if (piece & recursive_params->local_bitboard_pawn) moves = generate_pawn_moves(piece, recursive_params);
 
-    if (piece & global_bitboards.pawn) moves = generate_pawn_moves(piece);
+    if (piece & recursive_params->local_bitboard_rook) moves = generate_sliding_moves(piece, false, true, recursive_params->allies, recursive_params->enemies);
 
-    if (piece & global_bitboards.rook) moves = generate_sliding_moves(piece, false, true, allies, enemies);
+    if (piece & recursive_params->local_bitboard_knight) moves = generate_knight_moves(piece, recursive_params->allies, recursive_params->enemies);
 
-    if (piece & global_bitboards.knight) moves = generate_knight_moves(piece, allies, enemies);
+    if (piece & recursive_params->local_bitboard_bishop) moves = generate_sliding_moves(piece, true, false, recursive_params->allies, recursive_params->enemies);
 
-    if (piece & global_bitboards.bishop) moves = generate_sliding_moves(piece, true, false, allies, enemies);
+    if (piece & recursive_params->local_bitboard_queen) moves = generate_sliding_moves(piece, true, true, recursive_params->allies, recursive_params->enemies);
 
-    if (piece & global_bitboards.queen) moves = generate_sliding_moves(piece, true, true, allies, enemies);
-
-    if (piece & global_bitboards.king) moves = generate_king_moves(piece, allies, enemies);
+    if (piece & recursive_params->local_bitboard_king) moves = generate_king_moves(piece, recursive_params);
 
     return moves;
 }

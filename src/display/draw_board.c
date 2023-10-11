@@ -4,6 +4,7 @@
 #include "global.h"
 #include "utils.h"
 #include "board.h"
+#include "test.h"
 
 // global variable needed for this shitty library
 GLuint pieceTextures[2][6];
@@ -122,15 +123,15 @@ void drawChessboard(void)
     for (int pieceType = 0; pieceType < 6; pieceType++) {
         long long unsigned int piece = 0;
         switch (pieceType) {
-            case 0: piece = global_bitboards.rook; break;
-            case 1: piece = global_bitboards.knight; break;
-            case 2: piece = global_bitboards.bishop; break;
-            case 3: piece = global_bitboards.queen; break;
-            case 4: piece = global_bitboards.king; break;
-            case 5: piece = global_bitboards.pawn; break;
+            case 0: piece = recursive_params_glo.local_bitboard_rook; break;
+            case 1: piece = recursive_params_glo.local_bitboard_knight; break;
+            case 2: piece = recursive_params_glo.local_bitboard_bishop; break;
+            case 3: piece = recursive_params_glo.local_bitboard_queen; break;
+            case 4: piece = recursive_params_glo.local_bitboard_king; break;
+            case 5: piece = recursive_params_glo.local_bitboard_pawn; break;
         }
 
-        piece = piece & global_bitboards.white_pieces;
+        piece = piece & recursive_params_glo.local_bitboard_white;
         while (piece) {
             int square = __builtin_ffsll(piece) - 1;
             int x = (7 - (square % 8)) * GRIDSIZE;
@@ -143,15 +144,15 @@ void drawChessboard(void)
     for (int pieceType = 0; pieceType < 6; pieceType++) {
         long long unsigned int piece = 0;
         switch (pieceType) {
-            case 0: piece = global_bitboards.rook; break;
-            case 1: piece = global_bitboards.knight; break;
-            case 2: piece = global_bitboards.bishop; break;
-            case 3: piece = global_bitboards.queen; break;
-            case 4: piece = global_bitboards.king; break;
-            case 5: piece = global_bitboards.pawn; break;
+            case 0: piece = recursive_params_glo.local_bitboard_rook; break;
+            case 1: piece = recursive_params_glo.local_bitboard_knight; break;
+            case 2: piece = recursive_params_glo.local_bitboard_bishop; break;
+            case 3: piece = recursive_params_glo.local_bitboard_queen; break;
+            case 4: piece = recursive_params_glo.local_bitboard_king; break;
+            case 5: piece = recursive_params_glo.local_bitboard_pawn; break;
         }
 
-        piece = piece & global_bitboards.black_pieces;
+        piece = piece & recursive_params_glo.local_bitboard_black;
         while (piece) {
             int square = __builtin_ffsll(piece) - 1;
             int x = (7 - (square % 8)) * GRIDSIZE;
@@ -185,7 +186,7 @@ void init_display(int ac, char **av)
     gluOrtho2D(0, WINDOWWIDTH, 0, WINDOWHEIGHT);
 
     glutMouseFunc(onMouseClick);
-    glutKeyboardFunc(onKeyPress);
+    glutKeyboardFunc(run_test_move_nbr);
     glutDisplayFunc(display);
 
     rewind_chess_board(true, true);

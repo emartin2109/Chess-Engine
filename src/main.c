@@ -18,6 +18,7 @@ flags_t global_flags;
 precomputed_values_t precomputed_values;
 long long int global_highlighted_squares;
 moves_t current_moves = {0, 0, 0};
+recursive_params_t recursive_params_glo;
 
 int main (int argc, char **argv)
 {

@@ -19,5 +19,6 @@
     extern precomputed_values_t precomputed_values;
     extern long long int global_highlighted_squares;
     extern moves_t current_moves;
+    extern recursive_params_t recursive_params_glo;
 
 #endif /* !PUSHSWAP_H_ */

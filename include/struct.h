@@ -55,11 +55,32 @@
         long long unsigned int power[64];
         long long unsigned int filter_upper_piecies;
         long long unsigned int filter_lower_piecies;
+        long long unsigned int filter_pawns_strating_squares;
+        long long unsigned int filter_pawn_double_squares;
         long long unsigned int right_corners;
         long long unsigned int left_corners;
         unsigned char filter_everything_exept_lowest_rank;
 
     } precomputed_values_t;
+
+    typedef struct recursive_params_s {
+        long long unsigned int local_bitboard_white;
+        long long unsigned int local_bitboard_black;
+
+        long long unsigned int local_bitboard_rook;
+        long long unsigned int local_bitboard_knight;
+        long long unsigned int local_bitboard_bishop;
+        long long unsigned int local_bitboard_queen;
+        long long unsigned int local_bitboard_king;
+        long long unsigned int local_bitboard_pawn;
+
+        unsigned char actual_catle_right;
+        unsigned long long int actual_en_passant;
+        bool actual_white_turn;
+
+        long long unsigned int allies;
+        long long unsigned int enemies;
+    } recursive_params_t;
 
 
 #endif /* !STRUCT_H_ */
