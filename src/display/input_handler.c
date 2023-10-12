@@ -45,10 +45,14 @@ void onMouseClick(int button, int state, int x, int y)
             if (recursive_params_glo.actual_white_turn) {
                 recursive_params_glo.actual_en_passant = recursive_params_glo.actual_en_passant & precomputed_values.filter_upper_piecies;
                 recursive_params_glo.actual_white_turn = false;
+                recursive_params_glo.local_bitboard_black = recursive_params_glo.enemies;
+                recursive_params_glo.local_bitboard_white = recursive_params_glo.allies;
             }
             else {
                 recursive_params_glo.actual_en_passant = recursive_params_glo.actual_en_passant & precomputed_values.filter_lower_piecies;
                 recursive_params_glo.actual_white_turn = true;
+                recursive_params_glo.local_bitboard_black = recursive_params_glo.allies;
+                recursive_params_glo.local_bitboard_white = recursive_params_glo.enemies;
             }
             long long unsigned int temp = recursive_params_glo.allies;
             recursive_params_glo.allies = recursive_params_glo.enemies;

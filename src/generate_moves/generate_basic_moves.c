@@ -78,24 +78,22 @@ moves_t generate_pawn_moves (long long unsigned int piece, recursive_params_t *r
     if (recursive_params->actual_white_turn) {
         // double moves
         if (piece_nbr < 16) genearte_pawn_double_moves(precomputed_values.power[piece_nbr + 16], precomputed_values.power[piece_nbr + 8], recursive_params, &result);
-
         // en passant
-        generate_en_passant_moves_white(piece, piece_nbr, &result, recursive_params);
+        else generate_en_passant_moves_white(piece, piece_nbr, &result, recursive_params);
 
         // basic moves
-        if (precomputed_values.distances[piece_nbr].north && precomputed_values.distances[piece_nbr].west) generate_captures_by_bitboard(precomputed_values.power[piece_nbr + 7], recursive_params->local_bitboard_black, &result);
-        if (precomputed_values.distances[piece_nbr].north) generate_moves_by_bitboard(precomputed_values.power[piece_nbr + 8], recursive_params->local_bitboard_white, recursive_params->local_bitboard_black, &result);
-        if (precomputed_values.distances[piece_nbr].north && precomputed_values.distances[piece_nbr].east) generate_captures_by_bitboard(precomputed_values.power[piece_nbr + 9], recursive_params->local_bitboard_black, &result);
+        if (precomputed_values.distances[piece_nbr].west) generate_captures_by_bitboard(precomputed_values.power[piece_nbr + 7], recursive_params->local_bitboard_black, &result);
+        generate_moves_by_bitboard(precomputed_values.power[piece_nbr + 8], recursive_params->local_bitboard_white, recursive_params->local_bitboard_black, &result);
+        if (precomputed_values.distances[piece_nbr].east) generate_captures_by_bitboard(precomputed_values.power[piece_nbr + 9], recursive_params->local_bitboard_black, &result);
     }
     
     else {
         if (piece_nbr > 47) genearte_pawn_double_moves(precomputed_values.power[piece_nbr - 16], precomputed_values.power[piece_nbr - 8], recursive_params, &result);
+        else generate_en_passant_moves_black(piece, piece_nbr, &result, recursive_params);
 
-        generate_en_passant_moves_black(piece, piece_nbr, &result, recursive_params);
-
-        if (precomputed_values.distances[piece_nbr].south && precomputed_values.distances[piece_nbr].east) generate_captures_by_bitboard(precomputed_values.power[piece_nbr - 7], recursive_params->local_bitboard_white, &result);
-        if (precomputed_values.distances[piece_nbr].south) generate_moves_by_bitboard(precomputed_values.power[piece_nbr - 8], recursive_params->local_bitboard_black, recursive_params->local_bitboard_white, &result);
-        if (precomputed_values.distances[piece_nbr].south && precomputed_values.distances[piece_nbr].west) generate_captures_by_bitboard(precomputed_values.power[piece_nbr - 9], recursive_params->local_bitboard_white, &result);
+        if (precomputed_values.distances[piece_nbr].east) generate_captures_by_bitboard(precomputed_values.power[piece_nbr - 7], recursive_params->local_bitboard_white, &result);
+        generate_moves_by_bitboard(precomputed_values.power[piece_nbr - 8], recursive_params->local_bitboard_black, recursive_params->local_bitboard_white, &result);
+        if (precomputed_values.distances[piece_nbr].west) generate_captures_by_bitboard(precomputed_values.power[piece_nbr - 9], recursive_params->local_bitboard_white, &result);
     }
 
     return result;

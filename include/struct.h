@@ -80,6 +80,9 @@
 
         long long unsigned int allies;
         long long unsigned int enemies;
+
+        long long unsigned int attacked_square_b;
+        long long unsigned int attacked_square_w;
     } recursive_params_t;
 
 

@@ -14,13 +14,5 @@ recursive_params_t make_move(long long unsigned int start, long long unsigned in
     recursive_params.local_bitboard_bishop = update_bitboard(recursive_params.local_bitboard_bishop, start, dest, &recursive_params);
     recursive_params.local_bitboard_queen = update_bitboard(recursive_params.local_bitboard_queen, start, dest, &recursive_params);
 
-    if (recursive_params.actual_white_turn) {
-        recursive_params.local_bitboard_white = recursive_params.allies;
-        recursive_params.local_bitboard_black = recursive_params.enemies;
-    } else {
-        recursive_params.local_bitboard_black = recursive_params.allies;
-        recursive_params.local_bitboard_white = recursive_params.enemies;
-    }
-
     return recursive_params;
 }

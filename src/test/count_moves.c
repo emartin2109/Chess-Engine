@@ -70,11 +70,14 @@ recursive_params_t prepare_recursive_params(recursive_params_t recursive_params)
 {
     if (recursive_params.actual_white_turn) {
         recursive_params.actual_en_passant = recursive_params.actual_en_passant & precomputed_values.filter_upper_piecies;
-        recursive_params.actual_white_turn = false;
+        recursive_params.local_bitboard_white = recursive_params.allies;
+        recursive_params.local_bitboard_black = recursive_params.enemies;
     } else {
         recursive_params.actual_en_passant = recursive_params.actual_en_passant & precomputed_values.filter_lower_piecies;
-        recursive_params.actual_white_turn = true;
+        recursive_params.local_bitboard_black = recursive_params.allies;
+        recursive_params.local_bitboard_white = recursive_params.enemies;
     }
+    recursive_params.actual_white_turn = !recursive_params.actual_white_turn;
     long long unsigned int temp = recursive_params.allies;
     recursive_params.allies = recursive_params.enemies;
     recursive_params.enemies = temp;
