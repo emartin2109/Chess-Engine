@@ -57,6 +57,10 @@
         long long unsigned int filter_lower_piecies;
         long long unsigned int filter_pawns_strating_squares;
         long long unsigned int filter_pawn_double_squares;
+        long long unsigned int filter_edge_up;
+        long long unsigned int filter_edge_down;
+        long long unsigned int filter_edge_right;
+        long long unsigned int filter_edge_left;
         long long unsigned int right_corners;
         long long unsigned int left_corners;
         unsigned char filter_everything_exept_lowest_rank;

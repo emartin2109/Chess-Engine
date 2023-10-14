@@ -11,7 +11,7 @@
     // personalizable stuffs
     #define START_POS "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     #define REWIND_MEMORY 50
-    #define MAX_DEPTH 5
+    #define MAX_DEPTH 4
 
     // OPENGL stuffs
     #define WINDOWWIDTH 1000

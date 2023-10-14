@@ -13,6 +13,10 @@
     // generate_basic_moves_.c
     moves_t get_action_from_bitboard (long long unsigned int piece, recursive_params_t *recursive_params);
     
+    moves_t generate_king_moves (long long unsigned int piece, recursive_params_t *recursive_params);
+    moves_t generate_sliding_moves(long long unsigned int piece, bool diagonal, bool linear, recursive_params_t *recursive_params);
+
+
     // generate_special_moves.c
     void genearte_pawn_double_moves (long long unsigned int move, long long unsigned int single_move, recursive_params_t *recursive_params ,moves_t *already_generated_moves);
     void generate_en_passant_moves_white (long long unsigned int pawn, int piece_nbr, moves_t *already_generated_moves, recursive_params_t *recursive_params);

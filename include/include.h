@@ -12,6 +12,8 @@
     #include <stdio.h>
     #include <stdbool.h>
     #include <math.h>
+    #include <stdlib.h>
+    #include <time.h>
 
     // display stuff
     #include <GL/glut.h>

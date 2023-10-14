@@ -4,7 +4,6 @@
 #include "utils.h"
 #include "global.h"
 
-
 void generate_moves_by_bitboard(long long unsigned int move, long long unsigned int allies, long long unsigned int enemies, moves_t *already_generated_moves)
 {
     if (!(move & (allies | enemies))) {
@@ -25,13 +24,13 @@ void generate_moves_and_captures_by_bitboard(long long unsigned int move, long l
     generate_captures_by_bitboard(move, enemies, already_generated_moves);
 }
 
-void generate_moves_and_captures_by_offset(long long unsigned int piece, int offset, int distance_to_edge, long long unsigned int allies, long long unsigned int enemies, moves_t *already_generated_moves)
+void generate_moves_and_captures_by_offset(long long unsigned int piece, int offset, int distance_to_edge, recursive_params_t *recursive_params, moves_t *already_generated_moves)
 {
     for (int i = 0; i < distance_to_edge; i++) {
         if (offset > 0) piece = piece << offset;
         if (offset < 0) piece = piece >> -offset;
-        if (piece & allies) return;
-        if (piece & enemies) {
+        if (piece & recursive_params->allies) return;
+        if (piece & recursive_params->enemies) {
             already_generated_moves[0].captures += piece;
             return;
         }
@@ -39,8 +38,19 @@ void generate_moves_and_captures_by_offset(long long unsigned int piece, int off
     }
 }
 
+void generate_rook_moves(int piece_nbr, recursive_params_t recursive_params, moves_t *moves)
+{
+    unsigned long long int all_piecies_bitboard = recursive_params.allies | recursive_params.enemies;
+    unsigned long long int blocker_bitboard = all_piecies_bitboard & rook_mask[piece_nbr];
+    unsigned long long int key = (blocker_bitboard * RookMagics[piece_nbr]) >> RookShifts[piece_nbr];
 
-moves_t generate_sliding_moves(long long unsigned int piece, bool diagonal, bool linear, long long unsigned int allies, long long unsigned int enemies)
+    long long unsigned int moves_bitboard = lookup_table_rook[piece_nbr][key];
+    moves_bitboard &= ~recursive_params.allies;
+    moves->moves |= moves_bitboard;
+    // print_bitboard(blocker_bitboard);
+}
+
+moves_t generate_sliding_moves(long long unsigned int piece, bool diagonal, bool linear, recursive_params_t *recursive_params)
 {
     moves_t result;
     int piece_nbr = __builtin_ctzll(piece);
@@ -50,17 +60,17 @@ moves_t generate_sliding_moves(long long unsigned int piece, bool diagonal, bool
     result.en_passant = 0;
 
     if (linear) {
-        generate_moves_and_captures_by_offset(piece, 8, precomputed_values.distances[piece_nbr].north, allies, enemies, &result);
-        generate_moves_and_captures_by_offset(piece, -8, precomputed_values.distances[piece_nbr].south, allies, enemies, &result);
-        generate_moves_and_captures_by_offset(piece, -1, precomputed_values.distances[piece_nbr].west, allies, enemies, &result);
-        generate_moves_and_captures_by_offset(piece, 1, precomputed_values.distances[piece_nbr].east, allies, enemies, &result);
+        generate_moves_and_captures_by_offset(piece, 8, precomputed_values.distances[piece_nbr].north, recursive_params, &result);
+        generate_moves_and_captures_by_offset(piece, -8, precomputed_values.distances[piece_nbr].south, recursive_params, &result);
+        generate_moves_and_captures_by_offset(piece, -1, precomputed_values.distances[piece_nbr].west, recursive_params, &result);
+        generate_moves_and_captures_by_offset(piece, 1, precomputed_values.distances[piece_nbr].east, recursive_params, &result);
     }
 
     if (diagonal) {
-        generate_moves_and_captures_by_offset(piece, 7, precomputed_values.distances[piece_nbr].north_west, allies, enemies, &result);
-        generate_moves_and_captures_by_offset(piece, 9, precomputed_values.distances[piece_nbr].north_east, allies, enemies, &result);
-        generate_moves_and_captures_by_offset(piece, -9, precomputed_values.distances[piece_nbr].south_west, allies, enemies, &result);
-        generate_moves_and_captures_by_offset(piece, -7, precomputed_values.distances[piece_nbr].south_east, allies, enemies, &result);
+        generate_moves_and_captures_by_offset(piece, 7, precomputed_values.distances[piece_nbr].north_west, recursive_params, &result);
+        generate_moves_and_captures_by_offset(piece, 9, precomputed_values.distances[piece_nbr].north_east, recursive_params, &result);
+        generate_moves_and_captures_by_offset(piece, -9, precomputed_values.distances[piece_nbr].south_west, recursive_params, &result);
+        generate_moves_and_captures_by_offset(piece, -7, precomputed_values.distances[piece_nbr].south_east, recursive_params, &result);
     }
 
     return result;
@@ -152,19 +162,17 @@ moves_t generate_king_moves (long long unsigned int piece, recursive_params_t *r
 
 moves_t get_action_from_bitboard (long long unsigned int piece, recursive_params_t *recursive_params)
 {
-    moves_t moves;
+    moves_t moves = {0, 0, 0};
 
     if (piece & recursive_params->local_bitboard_pawn) moves = generate_pawn_moves(piece, recursive_params);
 
-    if (piece & recursive_params->local_bitboard_rook) moves = generate_sliding_moves(piece, false, true, recursive_params->allies, recursive_params->enemies);
-
     if (piece & recursive_params->local_bitboard_knight) moves = generate_knight_moves(piece, recursive_params->allies, recursive_params->enemies);
 
-    if (piece & recursive_params->local_bitboard_bishop) moves = generate_sliding_moves(piece, true, false, recursive_params->allies, recursive_params->enemies);
+    if (piece & recursive_params->local_bitboard_bishop) moves = generate_sliding_moves(piece, true, false, recursive_params);
 
-    if (piece & recursive_params->local_bitboard_queen) moves = generate_sliding_moves(piece, true, true, recursive_params->allies, recursive_params->enemies);
+    if (piece & recursive_params->local_bitboard_queen) moves = generate_sliding_moves(piece, true, true, recursive_params);
 
-    if (piece & recursive_params->local_bitboard_king) moves = generate_king_moves(piece, recursive_params);
+    if (piece & recursive_params->local_bitboard_rook) generate_rook_moves(__builtin_ctzll(piece), *recursive_params, &moves);
 
     return moves;
 }

@@ -49,3 +49,12 @@ int count_moves(long long unsigned int moves)
     return number_of_moves;
 }
 
+int count_ones(long long unsigned int bitboard)
+{
+    int result = 0;
+    while (bitboard != 0) {
+        result++;
+        bitboard -= __builtin_ffsll(bitboard) - 1;
+    }
+    return result;
+}
