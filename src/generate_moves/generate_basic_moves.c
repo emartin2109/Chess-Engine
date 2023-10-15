@@ -40,14 +40,18 @@ void generate_moves_and_captures_by_offset(long long unsigned int piece, int off
 
 void generate_rook_moves(int piece_nbr, recursive_params_t recursive_params, moves_t *moves)
 {
-    unsigned long long int all_piecies_bitboard = recursive_params.allies | recursive_params.enemies;
-    unsigned long long int blocker_bitboard = all_piecies_bitboard & rook_mask[piece_nbr];
-    unsigned long long int key = (blocker_bitboard * RookMagics[piece_nbr]) >> RookShifts[piece_nbr];
+    moves->moves |= lookup_table_rook[piece_nbr][(((recursive_params.allies | recursive_params.enemies) & rook_mask[piece_nbr]) * RookMagics[piece_nbr]) >> RookShifts[piece_nbr]] & ~recursive_params.allies;;
+}
 
-    long long unsigned int moves_bitboard = lookup_table_rook[piece_nbr][key];
-    moves_bitboard &= ~recursive_params.allies;
-    moves->moves |= moves_bitboard;
-    // print_bitboard(blocker_bitboard);
+void generate_bishop_moves(int piece_nbr, recursive_params_t recursive_params, moves_t *moves)
+{
+    moves->moves |= lookup_table_bishop[piece_nbr][(((recursive_params.allies | recursive_params.enemies) & bishop_mask[piece_nbr]) * BishopMagics[piece_nbr]) >> BishopShifts[piece_nbr]] & ~recursive_params.allies;
+}
+
+void generate_queen_moves(int piece_nbr, recursive_params_t recursive_params, moves_t *moves)
+{
+    generate_rook_moves(piece_nbr, recursive_params, moves);
+    generate_bishop_moves(piece_nbr, recursive_params, moves);
 }
 
 moves_t generate_sliding_moves(long long unsigned int piece, bool diagonal, bool linear, recursive_params_t *recursive_params)
@@ -165,14 +169,10 @@ moves_t get_action_from_bitboard (long long unsigned int piece, recursive_params
     moves_t moves = {0, 0, 0};
 
     if (piece & recursive_params->local_bitboard_pawn) moves = generate_pawn_moves(piece, recursive_params);
-
-    if (piece & recursive_params->local_bitboard_knight) moves = generate_knight_moves(piece, recursive_params->allies, recursive_params->enemies);
-
-    if (piece & recursive_params->local_bitboard_bishop) moves = generate_sliding_moves(piece, true, false, recursive_params);
-
-    if (piece & recursive_params->local_bitboard_queen) moves = generate_sliding_moves(piece, true, true, recursive_params);
-
-    if (piece & recursive_params->local_bitboard_rook) generate_rook_moves(__builtin_ctzll(piece), *recursive_params, &moves);
+    else if (piece & recursive_params->local_bitboard_knight) moves = generate_knight_moves(piece, recursive_params->allies, recursive_params->enemies);
+    else if (piece & recursive_params->local_bitboard_rook) generate_rook_moves(__builtin_ctzll(piece), *recursive_params, &moves);
+    else if (piece & recursive_params->local_bitboard_bishop) generate_bishop_moves(__builtin_ctzll(piece), *recursive_params, &moves);
+    else if (piece & recursive_params->local_bitboard_queen) generate_queen_moves(__builtin_ctzll(piece), *recursive_params, &moves);
 
     return moves;
 }

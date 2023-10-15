@@ -19,6 +19,7 @@
 
 
     extern long long unsigned int **lookup_table_rook;
+    extern long long unsigned int **lookup_table_bishop;
     extern long long unsigned int rook_mask[64];
     extern long long unsigned int bishop_mask[64];
 

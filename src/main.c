@@ -21,10 +21,11 @@ const long long unsigned int BishopMagics[] = { 16509839532542417919u, 143918039
 
 
 // const stuff that cant be declare as const because c is dumb
+long long unsigned int **lookup_table_bishop;
 long long unsigned int **lookup_table_rook;
-long long unsigned int rook_mask[64];
-long long unsigned int bishop_mask[64];
 precomputed_values_t precomputed_values;
+long long unsigned int bishop_mask[64];
+long long unsigned int rook_mask[64];
 
 // global stuff so its not passed in every single function
 flags_t global_flags;

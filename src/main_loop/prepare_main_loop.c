@@ -18,6 +18,7 @@ void prepare_main_loop(int ac, char **av)
     precompute_distance_to_edge();
     precompute_power();
     generate_rook_lookup_table();
+    generate_bishop_lookup_table();
 
     // create board
     create_board(START_POS);

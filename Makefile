@@ -25,7 +25,7 @@ OBJ	=	$(SRC:.c=.o)
 
 NAME	=	ChessEngine
 
-CFLAGS += -W -Wall -Wextra -Wshadow -Wimplicit -Werror -g
+CFLAGS += -Wall -O3
 
 CPPFLAGS += -I./include
 
@@ -33,7 +33,7 @@ all:	$(NAME)
 PHONY	+= all
 
 $(NAME):	$(OBJ)
-	gcc -o $(NAME) $(OBJ) -lGL -lGLU -lglut -lSOIL
+	gcc -o $(NAME) $(OBJ) -lGL -lGLU -lglut -lSOIL -pg
 
 clean:
 	rm -f $(OBJ)
