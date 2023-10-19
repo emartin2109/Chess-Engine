@@ -30,5 +30,9 @@
     #define PROMOTE_ROOK_FLAG 0b0101
     #define PROMOTE_BISHOP_FLAG 0b0110
 
+    // Monte Carlo settings
+    #define UCT_CONST 1.0
+    #define SIMULATIONS 1000
+
 
 #endif /* !DEFINE_H_ */

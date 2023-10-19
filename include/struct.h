@@ -89,5 +89,13 @@
         long long unsigned int attacked_square_w;
     } recursive_params_t;
 
+    typedef struct node_s {
+        struct node_s* parent;
+        struct node_s* children;
+        int num_children;
+        int visits;
+        double value;
+    } node_t;
+
 
 #endif /* !STRUCT_H_ */

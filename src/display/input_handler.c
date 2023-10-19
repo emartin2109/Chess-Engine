@@ -62,7 +62,14 @@ void onMouseClick(int button, int state, int x, int y)
         else if (((recursive_params_glo.local_bitboard_white & precomputed_values.power[selectedSquareIndex]) && recursive_params_glo.actual_white_turn) || (recursive_params_glo.local_bitboard_black & precomputed_values.power[selectedSquareIndex] && !recursive_params_glo.actual_white_turn)) {
             // If no piece is selected, check if there is a piece on the selected square
             printf("seleted: %c%d\n", squareX + 'A', squareY + 1);
-            current_moves = get_action_from_bitboard(precomputed_values.power[selectedSquareIndex], &recursive_params_glo);
+            if (precomputed_values.power[selectedSquareIndex] & recursive_params_glo.local_bitboard_king) {
+                print_bitboard(precomputed_values.power[selectedSquareIndex]);
+                printf("\n");
+                print_bitboard(recursive_params_glo.local_bitboard_king);
+                printf("\n\n\n");
+                current_moves = generate_king_moves(precomputed_values.power[selectedSquareIndex], &recursive_params_glo);
+            }
+            else current_moves = get_action_from_bitboard(precomputed_values.power[selectedSquareIndex], &recursive_params_glo);
             global_highlighted_squares = current_moves.captures | current_moves.moves;
             selectedPiece = precomputed_values.power[selectedSquareIndex];
             display();
@@ -86,6 +93,13 @@ void onKeyPress(unsigned char key, int x, int y)
     }
     if (key == 'q') {
         rewind_chess_board(false, false);
+        display();
+    }
+    if (key == 'n') {
+        printf("%llu\n", count_moves_at_depth(0, recursive_params_glo));
+    }
+    if (key == 'm') {
+        recursive_params_glo = make_move_ia(recursive_params_glo);
         display();
     }
 }

@@ -95,16 +95,33 @@ recursive_params_t prepare_recursive_params(recursive_params_t recursive_params)
 
 long long unsigned int count_moves_at_depth (int depth, recursive_params_t recursive_params)
 {
-long long unsigned int result = 0;
-long long unsigned int temp_allies = (recursive_params.allies | recursive_params.local_bitboard_king) ^ recursive_params.local_bitboard_king;
+    long long unsigned int result = 0;
+    long long unsigned int temp_allies = (recursive_params.allies | recursive_params.local_bitboard_king) ^ recursive_params.local_bitboard_king;
 
-if (depth >= MAX_DEPTH) return 1;
+    if (depth >= MAX_DEPTH) return 1;
 
-while (temp_allies != 0) {
-    int a_index = __builtin_ffsll(temp_allies) - 1;
-    temp_allies -= precomputed_values.power[a_index];
+    while (temp_allies != 0) {
+        int a_index = __builtin_ffsll(temp_allies) - 1;
+        temp_allies -= precomputed_values.power[a_index];
 
-    current_moves = get_action_from_bitboard(precomputed_values.power[a_index], &recursive_params);
+        current_moves = get_action_from_bitboard(precomputed_values.power[a_index], &recursive_params);
+        long long unsigned int moves = current_moves.moves | current_moves.captures;
+
+        while (moves != 0) {
+            int m_index = __builtin_ffsll(moves) - 1;
+            moves -= precomputed_values.power[m_index];
+
+            if (depth == MAX_DEPTH - 1) {
+                result++;
+            } else {
+                recursive_params_t temp_recursive = make_move(precomputed_values.power[a_index], precomputed_values.power[m_index], recursive_params);
+                result += count_moves_at_depth(depth + 1, prepare_recursive_params(temp_recursive));
+            }
+            }
+            }
+
+    int k_index = __builtin_ffsl(recursive_params.local_bitboard_king & recursive_params.allies) - 1;
+    current_moves = generate_king_moves (precomputed_values.power[k_index], &recursive_params);
     long long unsigned int moves = current_moves.moves | current_moves.captures;
 
     while (moves != 0) {
@@ -114,26 +131,9 @@ while (temp_allies != 0) {
         if (depth == MAX_DEPTH - 1) {
             result++;
         } else {
-            recursive_params_t temp_recursive = make_move(precomputed_values.power[a_index], precomputed_values.power[m_index], recursive_params);
+            recursive_params_t temp_recursive = make_move(precomputed_values.power[k_index], precomputed_values.power[m_index], recursive_params);
             result += count_moves_at_depth(depth + 1, prepare_recursive_params(temp_recursive));
         }
-    }
-}
-
-int k_index = __builtin_ffsl(recursive_params.local_bitboard_king & recursive_params.allies);
-current_moves = generate_king_moves (precomputed_values.power[k_index], &recursive_params);
-long long unsigned int moves = current_moves.moves | current_moves.captures;
-
-while (moves != 0) {
-    int m_index = __builtin_ffsll(moves) - 1;
-    moves -= precomputed_values.power[m_index];
-
-    if (depth == MAX_DEPTH - 1) {
-        result++;
-    } else {
-        recursive_params_t temp_recursive = make_move(precomputed_values.power[k_index], precomputed_values.power[m_index], recursive_params);
-        result += count_moves_at_depth(depth + 1, prepare_recursive_params(temp_recursive));
-    }
 }
 
 return result;

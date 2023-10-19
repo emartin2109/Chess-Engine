@@ -16,5 +16,6 @@
     long long unsigned int update_bitboard_king (long long unsigned int piece_bitboard, long long unsigned int Piece, long long unsigned int Square, recursive_params_t *recursive_params);
     // make_move.c
     recursive_params_t make_move(long long unsigned int start, long long unsigned int dest, recursive_params_t recursive_params);
+    recursive_params_t make_move_ia(recursive_params_t recursive_params);
 
 #endif /* !MOVE_H_ */

@@ -186,7 +186,7 @@ void init_display(int ac, char **av)
     gluOrtho2D(0, WINDOWWIDTH, 0, WINDOWHEIGHT);
 
     glutMouseFunc(onMouseClick);
-    glutKeyboardFunc(run_test_move_nbr);
+    glutKeyboardFunc(onKeyPress);
     glutDisplayFunc(display);
 
     rewind_chess_board(true, true);

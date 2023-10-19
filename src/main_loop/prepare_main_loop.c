@@ -24,8 +24,8 @@ void prepare_main_loop(int ac, char **av)
     create_board(START_POS);
 
     recursive_params_glo = get_recursive_params_glo();
-    // init_display(ac, av);
-    printf("%llu\n", count_moves_at_depth(0, get_recursive_params()));
+    init_display(ac, av);
+    // printf("%llu\n", count_moves_at_depth(0, get_recursive_params()));
 
     // stuff so that werror stop annoying me
     ac = ac;
