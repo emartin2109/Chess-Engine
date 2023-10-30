@@ -30,6 +30,9 @@ long long unsigned int rook_mask[64];
 // global stuff so its not passed in every single function
 flags_t global_flags;
 
+// bad code globals
+int global_nbr_moves;
+
 // pretty much useless stuff that need to be delete after some refactoring
 long long unsigned int global_highlighted_squares;
 recursive_params_t recursive_params_glo;

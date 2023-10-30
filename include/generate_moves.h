@@ -11,6 +11,7 @@
     #include "struct.h"
 
     // generate_basic_moves_.c
+    recursive_params_t *get_all_moves(recursive_params_t recursive_params);
     moves_t get_action_from_bitboard (long long unsigned int piece, recursive_params_t *recursive_params);
     
     moves_t generate_king_moves (long long unsigned int piece, recursive_params_t *recursive_params);

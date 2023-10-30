@@ -31,5 +31,6 @@
     extern moves_t current_moves;
     extern recursive_params_t recursive_params_glo;
     extern bitboards_t global_bitboards;
+    extern int global_nbr_moves;
 
 #endif /* !PUSHSWAP_H_ */

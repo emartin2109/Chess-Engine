@@ -19,13 +19,15 @@ SRC	=	src/main.c	                        			\
 		src/move/make_a_move.c							\
 		src/move/update_bitboards.c						\
 		src/dictionary_generation/lookup_table.c		\
+		src/ai/random.c									\
+		src/ai/mcts.c
 
 
 OBJ	=	$(SRC:.c=.o)
 
 NAME	=	ChessEngine
 
-CFLAGS += -Wall -O3
+CFLAGS += -Wall -g
 
 CPPFLAGS += -I./include
 
@@ -33,7 +35,7 @@ all:	$(NAME)
 PHONY	+= all
 
 $(NAME):	$(OBJ)
-	gcc -o $(NAME) $(OBJ) -lGL -lGLU -lglut -lSOIL -pg
+	gcc -o $(NAME) $(OBJ) -lGL -lGLU -lglut -lSOIL -lm
 
 clean:
 	rm -f $(OBJ)

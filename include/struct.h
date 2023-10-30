@@ -64,7 +64,6 @@
         long long unsigned int right_corners;
         long long unsigned int left_corners;
         unsigned char filter_everything_exept_lowest_rank;
-
     } precomputed_values_t;
 
     typedef struct recursive_params_s {
@@ -90,11 +89,13 @@
     } recursive_params_t;
 
     typedef struct node_s {
-        struct node_s* parent;
+        recursive_params_t board;
         struct node_s* children;
+        struct node_s* parent;
         int num_children;
-        int visits;
         double value;
+        int visits;
+        bool is_white;
     } node_t;
 
 

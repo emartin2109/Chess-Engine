@@ -8,10 +8,13 @@
 #ifndef DEFINE_H_
     #define DEFINE_H_
 
+    // the AI you wich to challlenge
+    #define AI "nerd"
+
     // personalizable stuffs
     #define START_POS "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     #define REWIND_MEMORY 50
-    #define MAX_DEPTH 4
+    #define MAX_DEPTH 7
 
     // OPENGL stuffs
     #define WINDOWWIDTH 1000
@@ -31,8 +34,8 @@
     #define PROMOTE_BISHOP_FLAG 0b0110
 
     // Monte Carlo settings
-    #define UCT_CONST 1.0
-    #define SIMULATIONS 1000
+    #define UCT_CONST 0.5
+    #define SIMULATIONS 100000
 
 
 #endif /* !DEFINE_H_ */
